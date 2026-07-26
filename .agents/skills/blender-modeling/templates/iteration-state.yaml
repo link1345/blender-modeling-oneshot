@@ -1,0 +1,42 @@
+task_id: replace-me
+iteration: 0
+iteration_label: iteration_00
+attempt_for_current_problem: 0
+maximum_attempts_for_current_problem: 3
+
+human_feedback: []
+out_of_scope:
+  - color
+  - materials
+  - textures
+  - lighting
+
+reference_images: []
+before_renders:
+  front: null
+  side: null
+  perspective: null
+  closeup: null
+candidate_renders:
+  front: null
+  side: null
+  perspective: null
+  closeup: null
+
+accepted_checkpoint: null
+candidate_checkpoint: null
+target_region: null
+protected_regions: []
+
+visual_analysis: null
+approved_plan: null
+modeler_result: null
+visual_review: null
+geometry_inspection: null
+
+decision:
+  status: INITIALIZE
+  reason: ""
+  next_role: visual_analyst
+
+history: []

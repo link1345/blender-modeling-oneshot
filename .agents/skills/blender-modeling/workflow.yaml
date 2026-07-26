@@ -1,0 +1,75 @@
+name: blender-reference-correction
+version: 1
+kind: declarative-orchestration-contract
+executable: false
+
+coordinator:
+  role_prompt: agent-prompts/coordinator.md
+  execution: root_agent
+  blender_access: none
+
+roles:
+  visual_analyst:
+    prompt: agent-prompts/visual-analyst.md
+    blender_access: none
+    writes_workspace: false
+  planner:
+    prompt: agent-prompts/planner.md
+    blender_access: read_only
+    writes_workspace: false
+  blender_modeler:
+    prompt: agent-prompts/blender-modeler.md
+    blender_access: read_write
+    writes_workspace: true
+  visual_reviewer:
+    prompt: agent-prompts/visual-reviewer.md
+    blender_access: none
+    writes_workspace: false
+  geometry_inspector:
+    prompt: agent-prompts/geometry-inspector.md
+    blender_access: read_only
+    writes_workspace: false
+
+sequence:
+  - coordinator_initialize
+  - visual_analyst
+  - coordinator_accept_analysis
+  - planner
+  - coordinator_approve_plan
+  - blender_modeler
+  - parallel:
+      - visual_reviewer
+      - geometry_inspector
+  - coordinator_decide
+
+limits:
+  max_attempts_per_problem: 3
+  max_major_changes_per_iteration: 1
+  max_minor_changes_per_iteration: 1
+  parallel_roles:
+    - visual_reviewer
+    - geometry_inspector
+
+rollback:
+  on_visual_regression: true
+  on_neutral_result: true
+  on_protected_region_change: true
+  on_blocking_geometry_failure: true
+
+paths:
+  state_template: templates/iteration-state.yaml
+  start_prompt: templates/start-prompt.md
+  final_checklist: references/quality-checklist.md
+  checkpoint_before: blender/checkpoints/<task_id>/iteration_<NN>_before.blend
+  checkpoint_candidate: blender/checkpoints/<task_id>/iteration_<NN>_candidate.blend
+  script: blender/scripts/<task_id>/iteration_<NN>_<change>.py
+  renders: blender/renders/<task_id>/iteration_<NN>_<view>.png
+
+completion:
+  require_visual_pass: true
+  require_no_blocking_geometry_failure: true
+  require_protected_regions_unchanged: true
+  decisions:
+    - PASS
+    - PASS_WITH_LIMITATIONS
+    - FAIL

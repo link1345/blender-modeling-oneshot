@@ -1,0 +1,143 @@
+# Multi-Agent Blender Correction Workflow
+
+Use this workflow when a reference-driven correction has caused regressions, invented geometry, or repeated visual failure. It is intended for local corrections to an existing asset, not for making several agents independently remodel the whole object.
+
+## Roles
+
+The root agent acts as Coordinator. It does not need a separate sub-agent.
+
+| Role | Reads Blender | Changes Blender | Output |
+| --- | --- | --- | --- |
+| Coordinator | As needed | No | state, routing, accept/retry/rollback decision |
+| Visual Analyst | images only | No | observed visual differences and approximate relative corrections |
+| Planner | scene metadata as needed | No | one bounded implementation plan |
+| Blender Modeler | Yes | Yes | checkpoint, script, edited scene, renders |
+| Visual Reviewer | images only | No | IMPROVED/NEUTRAL/REGRESSED and PASS/FAIL |
+| Geometry Inspector | Yes, read-only | No | mesh and scene validation |
+
+These are workflow permissions. If the runtime cannot technically enforce read-only Blender access, the Coordinator must enforce it through the role prompts and reject unauthorized edits.
+
+## Required files
+
+- Shared state: `templates/iteration-state.yaml`
+- Declarative workflow contract: `workflow.yaml`
+- Start prompt: `templates/start-prompt.md`
+- Role prompts: `agent-prompts/*.md`
+- Final geometry checklist: `references/quality-checklist.md`
+
+Resolve all relative paths from the `blender-modeling` skill directory.
+
+## Operating rules
+
+1. The human may provide subjective feedback such as "too thick", "blob-like", or "looks attached from the side". Do not ask the human to invent exact dimensions when the references can support a relative estimate.
+2. Use a stable visible feature as reference scale `1.0`. Record ranges or directional changes, not false precision.
+3. Change one major issue per iteration. A second minor correction is allowed only when it is inseparable from the first.
+4. Protect all regions outside the approved target.
+5. Save a checkpoint before the Blender Modeler changes the scene.
+6. The Blender Modeler must produce consistent before/after views.
+7. The Visual Reviewer and Geometry Inspector evaluate independently. They may run in parallel after renders and the edited checkpoint exist.
+8. Only the Coordinator accepts, retries, or rolls back a result.
+9. A Modeler self-assessment is evidence, never the completion decision.
+10. Never hide a failed shape under a new primitive or leave the obsolete shape inside the final result.
+
+## Execution sequence
+
+### 1. Initialize
+
+The Coordinator copies `templates/iteration-state.yaml`, fills known paths and human feedback, identifies protected regions, and records the current accepted checkpoint.
+
+### 2. Analyze
+
+Spawn a Visual Analyst with `agent-prompts/visual-analyst.md`. Give it only the reference images, consistent current renders, human feedback, target region, and protected regions.
+
+The Coordinator rejects analysis that:
+
+- treats lighting or color as geometry when they are out of scope
+- asserts hidden depth without evidence
+- invents decorative structure
+- lists more than three high-impact differences
+- presents image estimates as exact measurements
+
+### 3. Plan
+
+Spawn a Planner with `agent-prompts/planner.md`. Supply the accepted state and Visual Analyst result. The plan must name the exact target objects or state how the Modeler will discover them without editing.
+
+The Coordinator approves the plan only if it has:
+
+- one primary objective
+- explicit allowed and protected regions
+- a specific modeling technique
+- observable success criteria
+- rollback conditions
+- required output paths
+
+### 4. Implement
+
+Spawn one Blender Modeler with `agent-prompts/blender-modeler.md`. It is the only sub-agent authorized to edit the scene.
+
+The Modeler must:
+
+- inspect tools, Blender version, scene, objects, and scale first
+- save a before checkpoint
+- preserve or safely back up the current accepted geometry
+- make only the approved bounded change
+- save the reusable script under `blender/scripts/`
+- save a candidate checkpoint under `blender/checkpoints/`
+- render front, side, three-quarter, and target close-up views under `blender/renders/`
+- report exact modified, created, hidden, and deleted objects
+
+Use task-scoped paths so one attempt cannot overwrite another task's evidence:
+
+- `blender/checkpoints/<task_id>/iteration_XX_before.blend`
+- `blender/checkpoints/<task_id>/iteration_XX_candidate.blend`
+- `blender/scripts/<task_id>/iteration_XX_<change>.py`
+- `blender/renders/<task_id>/iteration_XX_front.png`
+- `blender/renders/<task_id>/iteration_XX_side.png`
+- `blender/renders/<task_id>/iteration_XX_perspective.png`
+- `blender/renders/<task_id>/iteration_XX_closeup.png`
+
+### 5. Review in parallel
+
+After implementation finishes, spawn:
+
+- Visual Reviewer using `agent-prompts/visual-reviewer.md`
+- Geometry Inspector using `agent-prompts/geometry-inspector.md`
+
+They must inspect the same candidate iteration. Neither may modify files or Blender state.
+
+### 6. Decide
+
+The Coordinator combines both reviews:
+
+| Visual result | Geometry result | Decision |
+| --- | --- | --- |
+| IMPROVED + visual PASS | PASS | ACCEPT |
+| IMPROVED + visual FAIL | PASS or warnings | RETRY one remaining visual issue |
+| IMPROVED | blocking geometry failure | RETRY technical repair or ROLLBACK |
+| NEUTRAL | any | ROLLBACK unless evidence proves a necessary intermediate step |
+| REGRESSED | any | ROLLBACK |
+| any | protected region changed | ROLLBACK |
+
+`PASS WITH LIMITATIONS` is allowed only when limitations do not violate the task's completion criteria and are recorded explicitly.
+
+## Retry and stopping rules
+
+- Maximum attempts for the same visual problem: 3.
+- Do not repeat the same technique after two failures without changing the geometric hypothesis.
+- After three failed attempts, stop that branch and report whether the likely cause is wrong object identification, wrong reference interpretation, unsuitable modeling technique, insufficient reference views, or insufficient MCP capability.
+- Do not silently expand the target region.
+- Do not exceed the runtime's available agent slots. Analysis, planning, and modeling are sequential; only the two independent reviews normally benefit from parallel execution.
+
+## Final gate
+
+Before completion:
+
+1. Read and apply `references/quality-checklist.md` for all applicable sections.
+2. Confirm the final accepted `.blend` is not merely the last attempted candidate.
+3. Confirm validation renders correspond to that exact accepted file.
+4. Record `PASS`, `PASS WITH LIMITATIONS`, or `FAIL` with reasons.
+5. Report checkpoints, scripts, renders, geometry statistics, protected-region verification, and known limitations.
+
+## Runtime note
+
+`workflow.yaml` is a declarative orchestration contract, not an executable agent runtime. In Codex, the root agent reads it and uses the available sub-agent delegation tools. Tool permissions such as `read_only` express required behavior; they are not a technical sandbox unless the host runtime enforces them.
