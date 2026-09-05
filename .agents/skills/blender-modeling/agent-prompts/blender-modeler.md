@@ -23,6 +23,8 @@ Read the active mode and required-delivery contract. In creation mode, implement
 
 ## Required evidence
 
+For reference-driven shape work, implement the approved setup in `references/reference-alignment.md` and supply aligned captures alongside clean views. Keep reference calibration stable and exclude reference helpers from exports.
+
 For creation and correction, save a candidate `.blend` and consistent front, side, three-quarter, and target close-up renders. For capture, provide the requested image set and source-preservation evidence; do not create extra views or remodel solely to fill this output template. Report all modified, created, hidden, and deleted objects. Record errors and measurable scene changes without grading your own visual success.
 
 ## Output

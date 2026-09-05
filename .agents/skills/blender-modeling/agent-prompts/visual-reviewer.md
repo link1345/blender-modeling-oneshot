@@ -6,6 +6,8 @@ Read the mode, stage criteria, and unresolved global gaps. At every creation-sta
 
 ## Review order
 
+When aligned reference captures are supplied, use `references/reference-alignment.md` to check registration before judging shape. Compare both overlay and clean views; do not accept apparent improvement caused by changed reference scale or framing.
+
 1. silhouette
 2. scale and proportion
 3. connection continuity

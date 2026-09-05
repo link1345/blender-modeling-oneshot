@@ -94,6 +94,8 @@ When reference images are available, identify:
 
 Separate observed facts from inferred geometry.
 
+For reference-driven shape work, read `references/reference-alignment.md`. Plan aligned in-scene image comparison before blockout or correction, and retain clean views for independent review. Use its fallback when the reference or available tools do not support reliable overlays.
+
 ## Phase 2: Define success before editing
 
 Write a concise task-specific completion checklist.

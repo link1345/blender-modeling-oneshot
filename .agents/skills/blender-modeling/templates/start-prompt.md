@@ -11,6 +11,8 @@ Read `references/creation-workflow.md`, `workflow.yaml`, and `templates/iteratio
 
 Reference sheets are design evidence, not renders of a current model. Identify uncertain views and state inferred geometry before implementation.
 
+For usable reference views, plan in-scene image alignment under `references/reference-alignment.md`. Have Modeler place and lock references, compare overlays and clean views, and exclude reference helpers from exports. Record projection conflicts or tool limitations instead of forcing every outline to match.
+
 ## Delivery contract
 
 - Required outputs and behavior: `[formats, static design, materials, rig/runtime needs, verification]`

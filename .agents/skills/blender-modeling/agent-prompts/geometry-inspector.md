@@ -16,6 +16,7 @@ You inspect the candidate Blender scene in read-only mode. You must not modify B
 - obsolete or duplicate objects
 - gaps, intersections, and modifier stack
 - unexpected changes to protected objects
+- reference helpers separated from asset geometry and absent from exported assets when in-scene reference comparison is used (see `references/reference-alignment.md`)
 
 For a claimed round shaft, do not trust its name. Check that cross-section vertices are approximately equidistant from the axis, radial dimensions are appropriate, and unapplied non-uniform scale is not faking the result.
 

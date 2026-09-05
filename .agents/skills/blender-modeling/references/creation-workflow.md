@@ -17,6 +17,8 @@ Plan cheap capability checks for uncertain shaders, rigs, and export paths early
 
 ## Review at stage boundaries
 
+For reference-driven shape stages, include the in-scene comparison setup from `reference-alignment.md` in the approved plan. Reuse its alignment through blockout and corrections rather than setting up a new comparison for every operation.
+
 Typical stages are **primary shape**, **reference appearance**, and **required delivery**. Adapt their order and subdivisions to dependencies; this is not a fixed number of tool calls.
 
 For each stage:

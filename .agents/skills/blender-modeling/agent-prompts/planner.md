@@ -15,6 +15,7 @@ You convert accepted findings into a creation-stage, local-correction, or captur
 - Prefer local modification. Rebuild only the target part when that is safer, and explain why.
 - Do not add reference-unsupported details or vague steps such as "make it look better".
 - Define observable success criteria and rollback conditions.
+- For reference-driven shape work, follow `references/reference-alignment.md`: plan view/crop, anchors, scale basis, conflicting-view priority, and overlay plus clean-view evidence. Reference placement is part of Modeler's approved work.
 - Carry global reference gaps to their planned stage. A technical stage with unchanged appearance needs technical evidence, not a fabricated visual improvement.
 - Diagnose boundedly after repeated failures, using the failure classification and counters in `references/retry-policy.md`.
 

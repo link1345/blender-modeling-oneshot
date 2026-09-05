@@ -25,6 +25,7 @@ out_of_scope: [] # Derive from this task; appearance is not excluded by default.
 assumptions: []
 
 reference_images: []
+reference_alignment: [] # Per view: source, crop, projection, anchors, scale_basis, transforms, framing, priority, limitations, overlay_paths, clean_paths.
 before_renders:
   front: null
   side: null
