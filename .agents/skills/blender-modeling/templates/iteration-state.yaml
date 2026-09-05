@@ -1,15 +1,28 @@
 task_id: replace-me
+mode: creation # creation | correction | capture
+stage: primary_shape
+originating_stage: null # Return here after a local correction.
 iteration: 0
 iteration_label: iteration_00
-attempt_for_current_problem: 0
-maximum_attempts_for_current_problem: 3
+
+required_deliverables: [] # Each: id, criterion, verification_method, status, path, evidence.
+optional_features: [] # Each: id, user_basis, status, evidence.
+required_delivery_checkpoint: null
+global_reference_criteria: [] # Each: id, criterion, required_by_stage, blocking_for_delivery.
+unresolved_global_gaps: [] # Each: criterion_id, evidence, planned_stage, blocking.
+
+retry_policy:
+  max_failed_candidates_per_problem: 3
+  max_execution_incidents_per_cause: 3
+  explicit_user_override: null
+current_problem_id: null
+problems: [] # Each: id, criterion, target, failed_candidates, hypothesis, evidence, status.
+execution_incidents: [] # Each: cause_id, category, count, evidence, recovery, status.
+diagnostic_plan: null # Finite tests and end condition; not a candidate acceptance.
 
 human_feedback: []
-out_of_scope:
-  - color
-  - materials
-  - textures
-  - lighting
+out_of_scope: [] # Derive from this task; appearance is not excluded by default.
+assumptions: []
 
 reference_images: []
 before_renders:
@@ -27,16 +40,20 @@ accepted_checkpoint: null
 candidate_checkpoint: null
 target_region: null
 protected_regions: []
+allowed_inspection_changes: []
+preservation_evidence: null
 
 visual_analysis: null
 approved_plan: null
 modeler_result: null
 visual_review: null
 geometry_inspection: null
+stage_result: null
+whole_asset_readiness: null
 
 decision:
   status: INITIALIZE
   reason: ""
   next_role: visual_analyst
 
-history: []
+history: [] # Each event: stage, problem/cause id, outcome, category, counter increment, evidence, decision.

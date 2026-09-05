@@ -1,12 +1,15 @@
-Use the `blender-modeling` skill and its multi-agent correction workflow for this task.
+Use the `blender-modeling` skill in multi-agent correction mode for this task.
 
 あなたはCoordinatorとして作業してください。
 
 最初に以下を読んでください。
 
 - `.agents/skills/blender-modeling/references/multi-agent-workflow.md`
+- `.agents/skills/blender-modeling/references/retry-policy.md`
 - `.agents/skills/blender-modeling/workflow.yaml`
 - `.agents/skills/blender-modeling/templates/iteration-state.yaml`
+
+状態テンプレートをタスク専用の場所へコピーし、`mode: correction` にしてください。
 
 各担当が必要になった段階で、
 `.agents/skills/blender-modeling/agent-prompts/`
@@ -61,7 +64,9 @@ Use the `blender-modeling` skill and its multi-agent correction workflow for thi
 - Modeler完了後にVisual ReviewerとGeometry Inspectorを独立して実行してください。
 - 修正前後を比較し、IMPROVED / NEUTRAL / REGRESSEDを判定してください。
 - NEUTRALまたはREGRESSEDなら候補を採用しないでください。
-- 同じ問題で3回失敗した場合は作業を止め、原因を報告してください。
+- 同じ対象・同じ未達基準に対する評価可能な候補が3回不合格なら、その修正を停止して原因と証拠を報告してください。仮説や手法を変えても回数をリセットしないでください。
+- ツール・環境・保護検査のエラーは、候補の視覚的不合格とは分けて記録してください。同じ原因の実行エラーも3回で停止し、際限なく再試行しないでください。保護対象の変更は必ず復元してください。
+- 新規制作の途中でこの修正モードを使う場合、局所的な合格の後に元の段階へ戻り、全体の見本との一致と必須成果物を再評価してください。
 - 指定されていない装飾を追加しないでください。
 - 修正対象外の部分を作り直さないでください。
 

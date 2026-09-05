@@ -1,7 +1,26 @@
-name: blender-reference-correction
-version: 1
+name: blender-modeling-multi-agent
+version: 2
 kind: declarative-orchestration-contract
 executable: false
+
+routing:
+  precedence: explicit_user_scope_and_stop_rules
+  creation:
+    reference: references/creation-workflow.md
+    unit_of_work: coherent_stage
+    stages: [primary_shape, reference_appearance, required_delivery]
+    optional_work_requires: verified_required_delivery
+    defect_route: correction
+  correction:
+    reference: references/multi-agent-workflow.md
+    unit_of_work: one_primary_problem
+    max_major_changes_per_iteration: 1
+    max_inseparable_minor_changes: 1
+    return_to: originating_stage_if_any
+  capture:
+    reference: references/creation-workflow.md
+    unit_of_work: requested_image_set
+    source_geometry_changes: forbidden
 
 coordinator:
   role_prompt: agent-prompts/coordinator.md
@@ -30,7 +49,7 @@ roles:
     blender_access: read_only
     writes_workspace: false
 
-sequence:
+sequence_per_stage_or_correction:
   - coordinator_initialize
   - visual_analyst
   - coordinator_accept_analysis
@@ -43,22 +62,30 @@ sequence:
   - coordinator_decide
 
 limits:
-  max_attempts_per_problem: 3
-  max_major_changes_per_iteration: 1
-  max_minor_changes_per_iteration: 1
+  policy: references/retry-policy.md
+  max_failed_candidates_per_problem: 3
+  max_execution_incidents_per_cause: 3
   parallel_roles:
     - visual_reviewer
     - geometry_inspector
 
 rollback:
   on_visual_regression: true
-  on_neutral_result: true
+  on_neutral_visual_correction: true
   on_protected_region_change: true
   on_blocking_geometry_failure: true
+
+acceptance:
+  visual_change: reference_progress_and_no_blocking_regression
+  initial_blockout: reference_criteria_without_fabricated_before_comparison
+  appearance_unchanged_technical_stage: verified_technical_result_and_no_visual_regression
+  capture: requested_views_readable_and_source_preserved
+  user_rejects_all_neutral: overrides_technical_stage_default
 
 paths:
   state_template: templates/iteration-state.yaml
   start_prompt: templates/start-prompt.md
+  correction_prompt: templates/correction-prompt.md
   final_checklist: references/quality-checklist.md
   checkpoint_before: blender/checkpoints/<task_id>/iteration_<NN>_before.blend
   checkpoint_candidate: blender/checkpoints/<task_id>/iteration_<NN>_candidate.blend
@@ -66,9 +93,12 @@ paths:
   renders: blender/renders/<task_id>/iteration_<NN>_<view>.png
 
 completion:
-  require_visual_pass: true
+  require_whole_asset_visual_pass: true
+  require_all_required_deliverables_verified: true
+  require_no_blocking_global_gaps: true
   require_no_blocking_geometry_failure: true
   require_protected_regions_unchanged: true
+  optional_failure_must_preserve: required_delivery_checkpoint
   decisions:
     - PASS
     - PASS_WITH_LIMITATIONS

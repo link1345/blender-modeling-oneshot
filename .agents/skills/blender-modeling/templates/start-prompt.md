@@ -1,33 +1,31 @@
-Use the `blender-modeling` skill and its multi-agent correction workflow for this task.
+Use the `blender-modeling` skill in multi-agent **creation** mode. Act as Coordinator.
 
-Act as the Coordinator. Read `references/multi-agent-workflow.md`, then load role prompts from `agent-prompts/` only when that role is needed. Initialize shared state from `templates/iteration-state.yaml`.
+Read `references/creation-workflow.md`, `workflow.yaml`, and `templates/iteration-state.yaml`. Load role prompts only when needed. Initialize a task-scoped state copy; do not edit the template during production.
 
-## Human feedback
+## Asset and references
 
-[Write subjective feedback here. Examples: too thick, blob-like, angular, looks pasted on, or less delicate than the reference.]
+- Asset and intended use: `[description]`
+- Reference images and known views: `[paths and labels]`
+- Existing scene to protect: `[path, or inspect the current scene]`
+- Required appearance, scale, and technical constraints: `[requirements]`
 
-## References
+Reference sheets are design evidence, not renders of a current model. Identify uncertain views and state inferred geometry before implementation.
 
-- Reference image: `[path]`
-- Current front render: `[path]`
-- Current side render: `[path]`
-- Current three-quarter render: `[path]`
-- Current accepted Blender file: `[path]`
+## Delivery contract
 
-## Scope
+- Required outputs and behavior: `[formats, static design, materials, rig/runtime needs, verification]`
+- Explicitly optional features: `[features, or none]`
 
-- Target region: `[region]`
-- Protected regions: `[regions that must not change]`
-- Out of scope: color, materials, textures, and lighting unless explicitly stated otherwise
+Do not downgrade required quality or behavior. Check uncertain dependencies early, secure and verify required delivery before optional experiments, and preserve that checkpoint.
 
-## Required behavior
+## Workflow
 
-- Do not ask me to invent exact dimensions. Derive approximate relative guidance from the supplied images and state uncertainty.
-- Correct one major issue per iteration.
-- Only the Blender Modeler may change the scene.
-- Save a checkpoint before every attempted change.
-- Review the candidate visually and geometrically before accepting it.
-- Roll back neutral or regressed candidates.
-- Stop after three failed attempts on the same problem and report the likely cause.
+- Begin with read-only Visual Analyst analysis, then a Planner stage plan approved by Coordinator.
+- Only Blender Modeler edits Blender. Preserve existing data and save a separate checkpoint before changes.
+- Review primary shape, reference appearance, and required delivery at coherent stage boundaries. Do not run the full delegation cycle for each small operation.
+- Visual Reviewer and Geometry Inspector independently review each stage. Evaluate the whole reference match, and carry unresolved global gaps forward.
+- Use `references/multi-agent-workflow.md` only for identified local defects, then return to the stage gate.
+- Use `references/retry-policy.md`: count reviewed candidate failures separately from execution incidents; both are bounded. Stop the affected branch at its limit. Optional failure must not discard required delivery.
+- Respect any stricter stopping or neutral-result rule I explicitly provide. A first blockout is assessed against references, and a technical stage must show actual technical evidence rather than invented visual improvement.
 
-Begin with read-only analysis. Do not modify Blender until the Visual Analyst result has been converted into an approved bounded plan.
+Do not declare completion until every required deliverable is verified and the whole-asset review has no blocking gaps. Report target-runtime limitations separately from Blender preview results.

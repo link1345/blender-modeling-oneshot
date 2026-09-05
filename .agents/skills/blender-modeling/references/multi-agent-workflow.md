@@ -2,6 +2,8 @@
 
 Use this workflow when a reference-driven correction has caused regressions, invented geometry, or repeated visual failure. It is intended for local corrections to an existing asset, not for making several agents independently remodel the whole object.
 
+For a new asset, start with `creation-workflow.md` and enter this loop only for an identified defect. Use `retry-policy.md` for failure classification and stopping. Explicit user instructions override these defaults.
+
 ## Roles
 
 The root agent acts as Coordinator. It does not need a separate sub-agent.
@@ -21,7 +23,7 @@ These are workflow permissions. If the runtime cannot technically enforce read-o
 
 - Shared state: `templates/iteration-state.yaml`
 - Declarative workflow contract: `workflow.yaml`
-- Start prompt: `templates/start-prompt.md`
+- Correction prompt: `templates/correction-prompt.md`
 - Role prompts: `agent-prompts/*.md`
 - Final geometry checklist: `references/quality-checklist.md`
 
@@ -39,12 +41,13 @@ Resolve all relative paths from the `blender-modeling` skill directory.
 8. Only the Coordinator accepts, retries, or rolls back a result.
 9. A Modeler self-assessment is evidence, never the completion decision.
 10. Never hide a failed shape under a new primitive or leave the obsolete shape inside the final result.
+11. Carry whole-asset gaps forward. A local acceptance does not mark the originating creation stage or required delivery complete.
 
 ## Execution sequence
 
 ### 1. Initialize
 
-The Coordinator copies `templates/iteration-state.yaml`, fills known paths and human feedback, identifies protected regions, and records the current accepted checkpoint.
+The Coordinator initializes a task-scoped copy of `templates/iteration-state.yaml` (do not edit the source template during a modeling run), sets `mode: correction`, fills paths and feedback, records the current accepted checkpoint, and identifies a stable problem criterion and protected regions. Preserve the originating stage and outstanding global gaps when entering from creation mode.
 
 ### 2. Analyze
 
@@ -114,17 +117,16 @@ The Coordinator combines both reviews:
 | IMPROVED + visual PASS | PASS | ACCEPT |
 | IMPROVED + visual FAIL | PASS or warnings | RETRY one remaining visual issue |
 | IMPROVED | blocking geometry failure | RETRY technical repair or ROLLBACK |
-| NEUTRAL | any | ROLLBACK unless evidence proves a necessary intermediate step |
+| NEUTRAL | any | ROLLBACK for a visual correction; use the technical-stage gate only if that scope was approved before execution and the user permits it |
 | REGRESSED | any | ROLLBACK |
 | any | protected region changed | ROLLBACK |
 
-`PASS WITH LIMITATIONS` is allowed only when limitations do not violate the task's completion criteria and are recorded explicitly.
+`PASS_WITH_LIMITATIONS` is allowed only when limitations do not violate the task's completion criteria and are recorded explicitly. Return an accepted local fix to its originating stage for whole-asset review. Missing required deliverables or defining reference features cannot be hidden in this status.
 
 ## Retry and stopping rules
 
-- Maximum attempts for the same visual problem: 3.
-- Do not repeat the same technique after two failures without changing the geometric hypothesis.
-- After three failed attempts, stop that branch and report whether the likely cause is wrong object identification, wrong reference interpretation, unsuitable modeling technique, insufficient reference views, or insufficient MCP capability.
+- Apply `retry-policy.md`: reviewed candidate failures and execution/protection incidents have separate bounded counters. A render or context error before reliable review is not evidence of a repeated visual defect.
+- Do not reset a defect's allowance by changing its suspected cause or renaming it. After two candidate failures, diagnose before another attempt; after three, stop that branch.
 - Do not silently expand the target region.
 - Do not exceed the runtime's available agent slots. Analysis, planning, and modeling are sequential; only the two independent reviews normally benefit from parallel execution.
 
@@ -135,8 +137,9 @@ Before completion:
 1. Read and apply `references/quality-checklist.md` for all applicable sections.
 2. Confirm the final accepted `.blend` is not merely the last attempted candidate.
 3. Confirm validation renders correspond to that exact accepted file.
-4. Record `PASS`, `PASS WITH LIMITATIONS`, or `FAIL` with reasons.
+4. Record `PASS`, `PASS_WITH_LIMITATIONS`, or `FAIL` with reasons.
 5. Report checkpoints, scripts, renders, geometry statistics, protected-region verification, and known limitations.
+6. Label a local pass as local. Completion of the user's task additionally requires the whole-asset gate and required-delivery evidence described in `creation-workflow.md`.
 
 ## Runtime note
 

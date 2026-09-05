@@ -13,7 +13,13 @@ The goal is not merely to make a scene that vaguely resembles the request. The g
 
 Before final validation, read `references/quality-checklist.md` and complete all applicable sections. Do not load or execute every section mechanically during early blockout work.
 
-When a reference-matching correction has already produced regressions, contradictory fixes, or invented geometry, use the multi-agent correction workflow in `references/multi-agent-workflow.md`. Load only the role prompts required for the current phase from `agent-prompts/`.
+When multi-agent work is requested, select its mode before editing:
+
+- **New asset:** read `references/creation-workflow.md`. Review coherent stages, then use the local correction loop only for identified defects.
+- **Existing asset correction:** read `references/multi-agent-workflow.md`. Keep each correction to one primary issue.
+- **Capture only:** use the capture guidance in `references/creation-workflow.md`; do not restart modeling to provide images.
+
+For these modes, `workflow.yaml` defines routing and `references/retry-policy.md` defines failure accounting. Load only role prompts needed for the current phase. Also use the correction workflow when reference matching has produced regressions, contradictory fixes, or invented geometry.
 
 ## Core principle
 
@@ -106,6 +112,8 @@ At minimum include:
 
 Do not start detailed modeling until this checklist exists.
 
+Separate required deliverables from explicitly optional features. Preserve the user's requested quality and functionality in the required list; do not downgrade them to make a baseline easier. Check uncertain tool/export capabilities early. Secure a verified required-delivery checkpoint before optional experiments, and keep it available if an experiment fails.
+
 ## Phase 3: Choose the modeling strategy
 
 Select a strategy based on the object.
@@ -187,6 +195,8 @@ After blockout:
 6. list the three largest discrepancies
 7. fix those discrepancies before proceeding
 
+An absent starting model is not a failed comparison: assess the first blockout against reference criteria and record the before comparison as `NOT_APPLICABLE`. Do not call a new shape improved merely because an empty scene now contains objects.
+
 ## Phase 5: Convert blockout into modeled geometry
 
 After the blockout is accepted, replace temporary construction with appropriate geometry.
@@ -231,6 +241,8 @@ Use the following correction loop:
 Do not make many unrelated changes between inspections.
 
 For the multi-agent workflow, the coordinating agent must keep authorship and review separate. Only the Blender Modeler may change the scene. The Visual Analyst, Planner, Visual Reviewer, and Geometry Inspector return findings or plans without editing Blender files.
+
+For new assets, the loop runs at meaningful stage boundaries rather than after every small operation. Review the whole reference match at those boundaries, including materials and defining details when in scope. Keep unresolved global gaps in shared state until fixed or explicitly removed from scope by the user. A local `PASS` must not erase them.
 
 When comparing against a reference, prioritize in this order:
 
@@ -323,6 +335,8 @@ If an operation fails:
 5. revise the script or operation
 6. rerun only the failed stage
 
+Use `references/retry-policy.md` to distinguish a reviewed candidate failure from an execution or protection incident. A rollback is required for protected-data damage regardless of which counter changes. Never rename the same unresolved defect to reset its allowance.
+
 Do not respond to failure by adding unrelated primitives.
 
 If the visual result is poor:
@@ -344,6 +358,7 @@ Do not declare completion until all applicable conditions are satisfied:
 - The model is suitable for its stated downstream use.
 - Final files and validation images have been saved.
 - Known shortcomings have been stated honestly.
+- Every required deliverable has recorded verification evidence, and the whole-asset reference review has no unresolved blocking gaps. Optional experiments cannot invalidate the accepted required-delivery checkpoint.
 
 ## Final response format
 

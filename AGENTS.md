@@ -64,9 +64,13 @@ When a Blender operator depends on selection, mode, area, or active-object conte
 
 Complex assets must be created iteratively.
 
+For new assets, plan coherent stages: primary shape, reference appearance, and required delivery. Complete and verify required deliverables before attempting optional features. A stage may contain several related modeling operations; do not run the full multi-agent correction cycle for every small operation. Use that cycle for an identified local defect.
+
+At each stage boundary, compare the whole asset to the reference as well as the edited region. A sequence of local passes does not establish overall completion. Classify failed candidates separately from tool, environment, and protection-check incidents using the skill's retry policy; explicit user stopping rules take precedence.
+
 For every major modeling stage:
 
-1. Make one bounded change.
+1. Implement the approved stage, or one bounded defect correction when in correction mode.
 2. Save or update the generating script.
 3. Execute the change.
 4. Inspect the result from multiple views.

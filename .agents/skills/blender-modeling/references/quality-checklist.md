@@ -15,6 +15,9 @@ Not every item applies to every asset. Mark non-applicable items explicitly inst
 - [ ] Any inferred geometry was documented.
 - [ ] The final result satisfies the task-specific completion criteria.
 - [ ] The model was not declared complete merely because a script executed successfully.
+- [ ] Required deliverables and user-optional features are listed separately.
+- [ ] Whole-asset reference gaps survived local reviews and all blocking gaps are resolved before delivery.
+- [ ] Optional work did not replace or damage the verified required-delivery checkpoint.
 
 ---
 
@@ -51,6 +54,7 @@ Inspect the model from consistent orthographic and perspective views.
 - [ ] Perspective proportions compared against the reference.
 - [ ] The three largest visible discrepancies were identified.
 - [ ] High-impact discrepancies were corrected before secondary detail was added.
+- [ ] Defining details and material character were compared across the whole asset; local passes were not substituted for overall fidelity.
 
 ---
 
@@ -510,6 +514,7 @@ Use when export is required.
 - [ ] Normals and tangents are exported correctly.
 - [ ] Exported file was imported into the target application for verification.
 - [ ] Imported result visually matches the Blender source.
+- [ ] File creation, re-import, scripted preview, and target-runtime behavior are reported as separate evidence levels.
 
 ---
 
@@ -531,6 +536,7 @@ The model may be declared complete only when all applicable statements are true.
 - [ ] Validation images were saved.
 - [ ] Known limitations were documented.
 - [ ] No unverified claim of success remains.
+- [ ] Every required output has verification evidence; missing requirements are not relabeled as optional limitations.
 
 ---
 
